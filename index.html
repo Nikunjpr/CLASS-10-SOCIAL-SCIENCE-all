@@ -2,12 +2,54 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Class 10 Social Science Master App</title>
 <!-- Screenshot Library -->
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <style>
+    /* MOBILE FIX CSS START */
+@media only screen and (max-width: 600px) {
+  body {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    overflow-x: hidden;
+  }
+  
+  /* मुख्य कंटेनर को ढीला छोड़ें */
+  .container, #container, .game-container {
+    width: 95% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 10px !important;
+    left: 0 !important;
+    transform: none !important; /* अगर कोई पुराना transform लगा हो तो हटा दे */
+  }
+
+  /* हेडिंग का साइज़ छोटा करें */
+  h1, h2 {
+    font-size: 1.5rem !important;
+    line-height: 1.3 !important;
+    white-space: normal !important; /* टेक्स्ट को टूटने दें, पिचकाएं नहीं */
+  }
+
+  /* बटन्स को पूरी चौड़ाई दें */
+  .btn, button {
+    width: 100% !important;
+    margin-bottom: 10px !important;
+    font-size: 1rem !important;
+    display: block !important;
+  }
+  
+  /* जो टेक्स्ट कट रहा था, उसे ठीक करने के लिए */
+  * {
+    box-sizing: border-box;
+    word-wrap: break-word;
+  }
+}
+/* MOBILE FIX CSS END */
     /* --- CSS STYLES --- */
     :root {
         --primary: #3b82f6; /* Blue */
@@ -579,3 +621,4 @@
 </html>
 ```
 Use Arrow Up and Arrow Down to select a turn, Enter to jump to it, and Escape to return to the chat.
+
