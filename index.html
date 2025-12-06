@@ -1,156 +1,492 @@
-<!-- START OF PROFESSIONAL APP EMBED -->
-<div class="app-mockup-container">
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Social Science Master Quiz 2026</title>
+<!-- Screenshot Library -->
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<style>
+    /* --- CSS STYLES --- */
+    :root {
+        --primary: #2563eb; 
+        --success: #16a34a;
+        --danger: #dc2626;
+        --dark: #1e293b;
+        --light: #f8fafc;
+        --gradient: linear-gradient(135deg, #4f46e5, #2563eb);
+    }
+
+    body { font-family: 'Segoe UI', sans-serif; background: #e2e8f0; margin: 0; display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden; }
+
+    .app-card {
+        background: white;
+        width: 100%;
+        max-width: 600px;
+        min-height: 100vh;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+
+    /* HEADER */
+    .header {
+        background: var(--gradient);
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .header h2 { margin: 0; font-size: 1.1rem; font-weight: 700; }
+    .timer-badge { background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
+
+    /* PROGRESS BAR */
+    .progress-container { width: 100%; height: 4px; background: #e2e8f0; }
+    .progress-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.3s ease; }
+
+    /* SCREENS */
+    .screen { display: none; padding: 15px; flex-grow: 1; flex-direction: column; animation: slideIn 0.3s; padding-bottom: 80px; }
+    .active { display: flex; }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* MENU LIST */
+    .subject-header { font-size: 0.9rem; color: #64748b; font-weight: 700; margin: 15px 0 5px 0; text-transform: uppercase; letter-spacing: 1px; }
     
-    <!-- STYLE SECTION (CSS) -->
-    <style>
-        /* 1. Main Container Design */
-        .app-mockup-container {
-            width: 100%;
-            max-width: 500px; /* मोबाइल जैसा लुक रखने के लिए */
-            margin: 20px auto;
-            background: #ffffff;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15); /* 3D Shadow effect */
-            overflow: hidden;
-            border: 1px solid #e0e0e0;
-            font-family: 'Segoe UI', sans-serif;
-            position: relative;
-        }
+    .menu-item {
+        background: white;
+        border: 1px solid #e2e8f0;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 12px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-left: 5px solid var(--primary);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        transition: transform 0.1s;
+    }
+    .menu-item:active { transform: scale(0.98); background: #f1f5f9; }
+    .menu-item strong { color: var(--dark); font-size: 1rem; }
+    .menu-item span { font-size: 0.8rem; color: #64748b; background: #f1f5f9; padding: 3px 8px; border-radius: 6px; }
 
-        /* 2. Header Design (App Bar) */
-        .app-header {
-            background: linear-gradient(135deg, #2196f3, #1976d2); /* Blue Gradient */
-            color: white;
-            padding: 15px;
-            text-align: center;
-            font-size: 18px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
+    /* QUIZ INTERFACE */
+    .q-box { margin-top: 10px; }
+    .q-text { font-size: 1.15rem; font-weight: 600; color: #0f172a; margin-bottom: 20px; line-height: 1.5; }
+    
+    .opt-btn {
+        width: 100%;
+        padding: 15px;
+        background: white;
+        border: 2px solid #e2e8f0;
+        margin-bottom: 10px;
+        border-radius: 10px;
+        cursor: pointer;
+        text-align: left;
+        font-size: 1rem;
+        color: #334155;
+        transition: 0.2s;
+        font-weight: 500;
+        position: relative;
+    }
+    .opt-btn:active { background: #f8fafc; }
+    
+    .correct { background: #dcfce7 !important; border-color: var(--success) !important; color: #166534; }
+    .wrong { background: #fee2e2 !important; border-color: var(--danger) !important; color: #991b1b; }
+    .disabled { pointer-events: none; opacity: 0.9; }
 
-        /* 3. Iframe Wrapper (Loader ke liye) */
-        .iframe-wrapper {
-            position: relative;
-            width: 100%;
-            height: 80vh; /* मोबाइल स्क्रीन का 80% हिस्सा */
-            min-height: 600px;
-            background: #f4f7f6;
-        }
+    /* FOOTER BUTTONS */
+    .footer { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 600px; background: white; padding: 10px; border-top: 1px solid #e2e8f0; display: flex; gap: 10px; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+    .btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; color: white; cursor: pointer; font-size: 1rem; display: flex; justify-content: center; align-items: center; gap: 5px; }
+    .btn-primary { background: var(--primary); }
+    .btn-danger { background: var(--danger); }
+    .btn-ghost { background: #f1f5f9; color: #475569; }
 
-        /* 4. The Iframe Itself */
-        .app-iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            display: block;
-            opacity: 0; /* लोड होने तक छुपा रहेगा */
-            transition: opacity 0.5s ease;
-        }
+    /* RESULT CARD */
+    .result-area { text-align: center; padding: 20px; background: white; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
+    .score-big { font-size: 3rem; font-weight: 800; color: var(--primary); margin: 5px 0; }
+    .stars { font-size: 1.5rem; margin: 10px 0; }
 
-        /* 5. Loading Spinner */
-        .loader {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #2196f3;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            z-index: 1;
-        }
+    /* SETUP SCREEN */
+    .setup-box { background: white; padding: 20px; border-radius: 15px; text-align: center; border: 1px solid #e2e8f0; margin-top: 20px; }
+    input[type=number] { padding: 10px; font-size: 1.2rem; width: 80px; text-align: center; border: 2px solid #cbd5e1; border-radius: 8px; margin: 10px 0; }
 
-        @keyframes spin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+</style>
+</head>
+<body>
 
-        /* 6. Footer Controls */
-        .app-footer {
-            background: #fff;
-            padding: 10px;
-            border-top: 1px solid #eee;
-            display: flex;
-            justify-content: space-around;
-        }
+<div class="app-card">
+    <div class="header">
+        <h2 id="app-title">Social Science 2026</h2>
+        <div class="timer-badge" id="timer-box" style="display:none">⏳ <span id="timer">00:00</span></div>
+    </div>
+    <div class="progress-container"><div id="progress-fill" class="progress-fill"></div></div>
 
-        .action-btn {
-            background: #f1f3f4;
-            color: #333;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            cursor: pointer;
-            font-weight: bold;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            transition: 0.2s;
-        }
-
-        .action-btn:hover { background: #e0e0e0; }
-        .btn-primary { background: #e3f2fd; color: #1976d2; }
-
-    </style>
-
-    <!-- HEADER -->
-    <div class="app-header">
-        📚 Social Science Master App
+    <!-- 1. CHAPTERS -->
+    <div id="screen-chapters" class="screen active">
+        <div id="chapter-list"></div>
     </div>
 
-    <!-- CONTENT AREA -->
-    <div class="iframe-wrapper">
-        <!-- Loading Spinner -->
-        <div class="loader" id="app-loader"></div>
-
-        <!-- The Content -->
-        <iframe 
-            id="quiz-frame"
-            class="app-iframe"
-            src="https://nikunjpr.github.io/CLASS-10-SOCIAL-SCIENCE/" 
-            title="Class 10 Social Science"
-            onload="hideLoader()"
-            allowfullscreen>
-        </iframe>
+    <!-- 2. PARTS -->
+    <div id="screen-parts" class="screen">
+        <button class="btn btn-ghost" style="width:auto; margin-bottom:10px;" onclick="show('screen-chapters')">⬅ Back</button>
+        <h3 id="lbl-chapter" style="margin:0 0 15px 0; color:var(--dark);">Select Part</h3>
+        <div id="part-list"></div>
     </div>
 
-    <!-- FOOTER CONTROLS -->
-    <div class="app-footer">
-        <button class="action-btn" onclick="refreshApp()">🔄 Refresh</button>
-        <a href="https://nikunjpr.github.io/CLASS-10-SOCIAL-SCIENCE/" target="_blank" class="action-btn btn-primary">
-            ⛶ Full Screen
-        </a>
+    <!-- 3. SETUP -->
+    <div id="screen-setup" class="screen">
+        <button class="btn btn-ghost" style="width:auto; align-self:flex-start" onclick="show('screen-parts')">⬅ Back</button>
+        <div class="setup-box">
+            <h2 id="lbl-setup-topic" style="color:var(--primary); margin-bottom:5px;">Topic</h2>
+            <p style="color:#64748b;">कुल प्रश्न: <b id="lbl-total-q">0</b></p>
+            <hr style="margin:20px 0; border:0; border-top:1px solid #e2e8f0;">
+            <label>Time Limit (Minutes):</label><br>
+            <input type="number" id="inp-time" value="10">
+            <br><br>
+            <button class="btn btn-primary" style="width:100%" onclick="startQuiz()">Start Test ▶</button>
+        </div>
     </div>
 
-    <!-- JAVASCRIPT FOR PROFESSIONAL FEEL -->
-    <script>
-        // लोडर को छुपाने का फंक्शन
-        function hideLoader() {
-            var loader = document.getElementById('app-loader');
-            var iframe = document.getElementById('quiz-frame');
-            
-            // 1 सेकंड का जानबूझकर देरी ताकि एनीमेशन दिखे (Premium Feel)
-            setTimeout(function() {
-                loader.style.display = 'none';
-                iframe.style.opacity = '1';
-            }, 800);
-        }
+    <!-- 4. QUIZ -->
+    <div id="screen-quiz" class="screen">
+        <div style="display:flex; justify-content:space-between; color:#64748b; font-size:0.9rem;">
+            <span id="q-counter">Q: 1/10</span>
+            <span style="color:var(--success); font-weight:bold;">Auto-Next ON</span>
+        </div>
+        <div class="q-box">
+            <div id="q-text" class="q-text">Loading...</div>
+            <div id="opt-box"></div>
+        </div>
+    </div>
 
-        // रिफ्रेश बटन का फंक्शन
-        function refreshApp() {
-            var iframe = document.getElementById('quiz-frame');
-            var loader = document.getElementById('app-loader');
-            
-            iframe.style.opacity = '0';
-            loader.style.display = 'block';
-            iframe.src = iframe.src; // Reloads iframe
-        }
-    </script>
+    <!-- 5. RESULT -->
+    <div id="screen-result" class="screen">
+        <div id="capture-area" class="result-area">
+            <div style="font-size:0.9rem; font-weight:bold; color:var(--dark); text-transform:uppercase; letter-spacing:1px;">Result Card</div>
+            <div id="res-topic" style="color:#64748b; font-size:0.85rem; margin-bottom:10px;">Topic Name</div>
+            <div class="stars" id="lbl-stars">⭐⭐⭐</div>
+            <div class="score-big" id="lbl-percent">0%</div>
+            <div id="lbl-score">0 / 0 Correct</div>
+            <div style="margin-top:15px; font-size:0.75rem; color:#94a3b8;">(Test taken on Class 10 Study App)</div>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-bottom:60px;">
+            <button class="btn btn-ghost" onclick="retryQuiz()">🔄 Retry</button>
+            <button class="btn btn-success" id="btn-share" onclick="shareResult()">📤 Share</button>
+        </div>
+
+        <div id="review-box" style="margin-bottom:80px;"></div>
+    </div>
+
+    <!-- QUIZ FOOTER -->
+    <div id="quiz-footer" class="footer" style="display:none;">
+        <button class="btn btn-ghost" onclick="nav(-1)">Prev</button>
+        <button class="btn btn-danger" onclick="finishQuiz()">Submit</button>
+        <button class="btn btn-primary" onclick="nav(1)">Next</button>
+    </div>
+    
+    <!-- RESULT FOOTER -->
+    <div id="result-footer" class="footer" style="display:none;">
+        <button class="btn btn-primary" onclick="show('screen-chapters')">🏠 Home Menu</button>
+    </div>
 
 </div>
-<br>
-<!-- END OF PROFESSIONAL APP EMBED -->
+
+<script>
+    // ======================================================
+    // 📁 MASTER DATA (All Chapters Combined)
+    // ======================================================
+    const masterData = {
+        // --- HISTORY ---
+        "History: यूरोप में राष्ट्रवाद": [
+            {q:"इटली तथा जर्मनी वर्तमान में किस महादेश के अन्तर्गत आते हैं?", opt:["उत्तरी अमेरिका","दक्षिणी अमेरिका","यूरोप","पश्चिमी एशिया"], ans:2},
+            {q:"फ्रांस में किस शासन वंश की पुन: स्थापना वियना कांग्रेस द्वारा की गई थी?", opt:["हैप्सबर्ग","आर्लिया वंश","बूर्बो वंश","जारशाही"], ans:2},
+            {q:"मेजिनी का संबंध किस संगठन से था?", opt:["लाल सेना","कार्बोनरी","फिलिक हेटारिया","डायट"], ans:1},
+            {q:"इटली एवं जर्मनी के एकीकरण के विरुद्ध निम्न में कौन था?", opt:["इंग्लैण्ड","रूस","आस्ट्रिया","प्रशा"], ans:2},
+            {q:"काउंट काबूर को विक्टर इमैनुएल ने किस पद पर नियुक्त किया?", opt:["सेनापति","फ्रांस में राजदूत","प्रधानमंत्री","गृहमंत्री"], ans:2},
+            {q:"गैरीबाल्डी पेशे से क्या था?", opt:["सिपाही","किसान","जमींदार","नाविक"], ans:3},
+            {q:"जर्मन राइन राज्य का निर्माण किसने किया था?", opt:["लुई 18वाँ","नेपोलियन बोनापार्ट","नेपोलियन-II","बिस्मार्क"], ans:1},
+            {q:"जालवेरिन कैसी संस्था थी?", opt:["क्रांतिकारियों की","व्यापारियों की","विद्वानों की","पादरी एवं सामंतों की"], ans:1},
+            {q:"रक्त एवं लौह की नीति का अवलम्बन किसने किया?", opt:["मेजिनी","हिटलर","बिस्मार्क","विलियम-I"], ans:2},
+            {q:"फ्रैंकफर्ट की संधि कब हुई?", opt:["1864 ई०","1866 ई०","1870 ई०","1871 ई०"], ans:3}
+            // ... (Add remaining 43 questions here from previous history chat)
+        ],
+        "History: भारत में राष्ट्रवाद": [
+            {q:"गाँधीजी ने दांडी यात्रा किस तिथि को आरंभ की?", opt:["12 जनवरी 1930","12 फरवरी 1930","12 मार्च 1930","12 अप्रैल 1930"], ans:2},
+            {q:"गाँधीजी ने असहयोग आंदोलन की शुरुआत कब की?", opt:["1 मार्च 1920","1 मई 1920","1 अगस्त 1920","1 दिसम्बर 1920"], ans:2},
+            {q:"रम्पा विद्रोह कब हुआ था?", opt:["1916","1917","1918","1919"], ans:0}
+            // ... (Add remaining 42 questions here)
+        ],
+        "History: शहरीकरण और शहरी जीवन": [
+            {q:"‘गार्डन सीटी’ की अवधारणा किसने विकसित की थी?", opt:["एबेनेजर हावर्ड","विलियम","नेपोलियन III","हॉसमान"], ans:0},
+            {q:"लंदन में अनिवार्य प्राथमिक शिक्षा कब लागू हई?", opt:["1850","1855","1860","1870"], ans:3},
+            {q:"पूँजीपति वर्ग के द्वारा किस वर्ग का शोषण हुआ?", opt:["श्रमिक वर्ग","मध्यम वर्ग","कृषक वर्ग","ये सभी"], ans:0}
+            // ... (Add remaining questions)
+        ],
+        "History: व्यापार और भूमंडलीकरण": [
+            {q:"भूमंडलीकरण की शुरुआत किस दशक में हुई?", opt:["1990 के दशक में","1970 के दशक में","1960 के दशक में","1980 के दशक में"], ans:0},
+            {q:"गिरमिटिया किसे कहा जाता है?", opt:["अनुबंधित मजदूर को","रोगियों को","छिपकली को","अंग्रेजों को"], ans:0},
+            {q:"विश्वव्यापी आर्थिक संकट किस वर्ष आरंभ हुआ था?", opt:["1914","1922","1929","1927"], ans:2}
+            // ... (Add remaining questions)
+        ],
+        
+        // --- CIVICS ---
+        "Civics: लोकतंत्र में सत्ता की साझेदारी": [
+            {q:"भारत में कहाँ औरतों के लिए आरक्षण की व्यवस्था है?", opt:["लोकसभा","विधानसभा","मंत्रिमंडल","पंचायती राज्य संस्थाएँ"], ans:3},
+            {q:"बेल्जियम के किस शहर के स्कूलों में फ्रेंच बोलने पर रोक लगा दी गई हैं?", opt:["वेलोनिया","ब्रूसेल्स","मर्चटेम","मोन्स"], ans:2},
+            {q:"भारत में सर्वोच्च न्यायालय के मुख्य न्यायाधीश की नियुक्ति कौन करता हैं?", opt:["प्रधानमंत्री","राष्ट्रपति","संसद","उपराष्ट्रपति"], ans:1}
+        ],
+        "Civics: लोकतंत्र में प्रतिस्पर्धा एवं संघर्ष": [
+            {q:"‘सूचना के अधिकार आंदोलन’ की शुरुआत कहाँ से हुई?", opt:["राजस्थान","दिल्ली","तमिलनाडु","बिहार"], ans:0},
+            {q:"किस देश में बहुदलीय व्यवस्था नहीं है?", opt:["पाकिस्तान","भारत","बाँग्लादेश","ब्रिटेन"], ans:3},
+            {q:"सम्पूर्ण भारत में सूचना का अधिकार किस वर्ष लागू किया गया?", opt:["2005","2006","2007","2010"], ans:0}
+        ],
+
+        // --- ECONOMICS ---
+        "Economics: अर्थव्यवस्था एवं इसके विकास": [
+            {q:"निम्नांकित में किस राज्य को एक पिछड़ा राज्य कहा जाता है?", opt:["पंजाब","हरियाणा","गजरात","बिहार"], ans:3},
+            {q:"भारत में नीति आयोग की स्थापना हुई-", opt:["1950","1951","2005","2015"], ans:3},
+            {q:"किस क्षेत्र को तृतीयक क्षेत्र कहा जाता है?", opt:["सेवा क्षेत्र","कृषि क्षेत्र","औद्योगिक क्षेत्र","इनमें से कोई नहीं"], ans:0}
+        ],
+        "Economics: मुद्रा बचत एवं साख": [
+            {q:"विनिमय का सर्वोत्तम माध्यम है-", opt:["वस्तु","चेक","मुद्रा","प्रतिज्ञा-पत्र"], ans:2},
+            {q:"साख का संबंध है-", opt:["गरीबी से","उधार से","दोनों से","विश्वास से"], ans:3},
+            {q:"एक टी० एम० (ATM) का अर्थ है-", opt:["स्वचालित टेलर मशीन","स्वचालित टॉकिंग मशीन","स्वचालित टेकिंग मशीन","इनमें से कोई नहीं"], ans:0}
+        ],
+        "Economics: हमारी वित्तीय संस्थाएं": [
+            {q:"भारत के केन्द्रीय बैंक कौन है?", opt:["रिजर्व बैंक ऑफ इंडिया","क्षेत्रीय ग्रामीण बैंक","स्टेट बैंक ऑफ इंडिया","पंजाब नेशनल बैंक"], ans:0},
+            {q:"भारत की वित्तीय राजधानी किस शहर को कहा गया है?", opt:["मुंबई","दिल्ली","पटना","बंगलौर"], ans:0},
+            {q:"दीर्घकालीन ऋण प्रदान करनेवाली संस्था कौन-सी है?", opt:["कृषक महाजन","प्राथमिक कृषि साख समिति","भूमि विकास बैंक","इनमें कोई नहीं"], ans:2}
+        ]
+    };
+
+    // ==========================================
+    // ⚙️ APP LOGIC (Automatic Parts System)
+    // ==========================================
+    let currentQuiz = [], userAns = [], curIdx = 0, timerRef, timeSec = 0, autoNextTimeout;
+    let activeTopic = "";
+
+    function show(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        
+        // Handle Footer Visibility
+        document.getElementById('quiz-footer').style.display = (id === 'screen-quiz') ? 'flex' : 'none';
+        document.getElementById('result-footer').style.display = (id === 'screen-result') ? 'flex' : 'none';
+        document.getElementById('timer-box').style.display = (id === 'screen-quiz') ? 'flex' : 'none';
+        
+        window.scrollTo(0,0);
+    }
+
+    function initApp() {
+        const list = document.getElementById('chapter-list');
+        list.innerHTML = "";
+        
+        const subjects = {};
+        
+        // Group by Subject prefix (History:, Civics:, etc.)
+        Object.keys(masterData).forEach(key => {
+            const [subj, title] = key.includes(':') ? key.split(':') : ['Other', key];
+            if(!subjects[subj]) subjects[subj] = [];
+            subjects[subj].push({ fullKey: key, title: title.trim(), count: masterData[key].length });
+        });
+
+        // Render List
+        Object.keys(subjects).forEach(subj => {
+            const header = document.createElement('div');
+            header.className = 'subject-header';
+            header.innerText = subj;
+            list.appendChild(header);
+
+            subjects[subj].forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'menu-item';
+                div.innerHTML = `<strong>${item.title}</strong><span>${item.count} Q</span>`;
+                div.onclick = () => loadParts(item.fullKey, item.count);
+                list.appendChild(div);
+            });
+        });
+    }
+
+    function loadParts(key, total) {
+        activeTopic = key;
+        const list = document.getElementById('part-list');
+        list.innerHTML = "";
+        document.getElementById('lbl-chapter').innerText = key.split(':')[1] || key;
+
+        const partSize = 20;
+        const totalParts = Math.ceil(total / partSize);
+
+        for(let i=0; i<totalParts; i++) {
+            const start = i * partSize;
+            const end = Math.min((i+1) * partSize, total);
+            const partName = `Part ${i+1} (Q. ${start+1} - ${end})`;
+            
+            const div = document.createElement('div');
+            div.className = 'menu-item';
+            div.style.borderLeftColor = "var(--success)";
+            div.innerHTML = `<strong>${partName}</strong><span>▶</span>`;
+            div.onclick = () => setupQuiz(partName, masterData[key].slice(start, end));
+            list.appendChild(div);
+        }
+        show('screen-parts');
+    }
+
+    function setupQuiz(partName, questions) {
+        currentQuiz = questions;
+        document.getElementById('lbl-setup-topic').innerText = partName;
+        document.getElementById('lbl-total-q').innerText = questions.length;
+        show('screen-setup');
+    }
+
+    function startQuiz() {
+        const min = document.getElementById('inp-time').value;
+        timeSec = min ? parseInt(min) * 60 : 0;
+        userAns = new Array(currentQuiz.length).fill(null);
+        curIdx = 0;
+        
+        clearInterval(timerRef);
+        if(timeSec > 0) {
+            timerRef = setInterval(() => {
+                timeSec--;
+                let m = Math.floor(timeSec/60);
+                let s = timeSec%60;
+                document.getElementById('timer').innerText = `${m}:${s<10?'0':''}${s}`;
+                if(timeSec <= 0) finishQuiz();
+            }, 1000);
+        } else {
+            document.getElementById('timer').innerText = "∞";
+        }
+        
+        loadQuestion();
+        show('screen-quiz');
+    }
+
+    function loadQuestion() {
+        clearTimeout(autoNextTimeout);
+        const data = currentQuiz[curIdx];
+        document.getElementById('q-counter').innerText = `Q: ${curIdx+1}/${currentQuiz.length}`;
+        document.getElementById('q-text').innerText = `${curIdx+1}. ${data.q}`;
+        document.getElementById('progress-fill').style.width = `${((curIdx)/currentQuiz.length)*100}%`;
+        
+        const box = document.getElementById('opt-box');
+        box.innerHTML = "";
+        
+        data.opt.forEach((txt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            btn.innerText = `(${String.fromCharCode(65+i)}) ${txt}`;
+            
+            if(userAns[curIdx] !== null) {
+                btn.classList.add('disabled');
+                if(i === data.ans) btn.classList.add('correct');
+                else if(i === userAns[curIdx]) btn.classList.add('wrong');
+            } else {
+                btn.onclick = () => checkAns(i, btn);
+            }
+            box.appendChild(btn);
+        });
+    }
+
+    function checkAns(idx, btn) {
+        if(userAns[curIdx] !== null) return;
+        userAns[curIdx] = idx;
+        
+        const correct = currentQuiz[curIdx].ans;
+        const all = document.getElementById('opt-box').children;
+        
+        if(idx === correct) btn.classList.add('correct');
+        else {
+            btn.classList.add('wrong');
+            all[correct].classList.add('correct');
+            if(navigator.vibrate) navigator.vibrate(200);
+        }
+        
+        Array.from(all).forEach(b => b.classList.add('disabled'));
+        autoNextTimeout = setTimeout(() => { if(curIdx < currentQuiz.length-1) nav(1); }, 1500);
+    }
+
+    function nav(dir) {
+        clearTimeout(autoNextTimeout);
+        if(curIdx + dir >= 0 && curIdx + dir < currentQuiz.length) {
+            curIdx += dir;
+            loadQuestion();
+        }
+    }
+
+    function finishQuiz() {
+        clearInterval(timerRef);
+        clearTimeout(autoNextTimeout);
+        document.getElementById('progress-fill').style.width = '100%';
+        
+        let score = 0;
+        let reviewHtml = "";
+        
+        userAns.forEach((u, i) => {
+            const q = currentQuiz[i];
+            if(u === q.ans) score++;
+            else {
+                reviewHtml += `
+                <div style="background:#fff1f2; padding:10px; margin-bottom:10px; border-left:4px solid var(--danger); border-radius:5px;">
+                    <div style="font-weight:bold; margin-bottom:5px;">Q${i+1}: ${q.q}</div>
+                    <div style="color:#dc2626; font-size:0.9rem;">Your: ${u!==null?q.opt[u]:'Skipped'}</div>
+                    <div style="color:#16a34a; font-size:0.9rem;">Correct: ${q.opt[q.ans]}</div>
+                </div>`;
+            }
+        });
+
+        const percent = Math.round((score/currentQuiz.length)*100);
+        let stars = "⭐";
+        if(percent>=80) stars="⭐⭐⭐⭐⭐";
+        else if(percent>=60) stars="⭐⭐⭐⭐";
+        else if(percent>=40) stars="⭐⭐⭐";
+        else stars="⭐⭐";
+
+        document.getElementById('res-topic').innerText = activeTopic;
+        document.getElementById('lbl-percent').innerText = `${percent}%`;
+        document.getElementById('lbl-score').innerText = `${score} / ${currentQuiz.length} Correct`;
+        document.getElementById('lbl-stars').innerText = stars;
+        document.getElementById('review-box').innerHTML = reviewHtml || "<div style='text-align:center; color:green'>🎉 Perfect Score!</div>";
+        
+        show('screen-result');
+    }
+
+    function retryQuiz() { startQuiz(); }
+
+    function shareResult() {
+        const btn = document.getElementById('btn-share');
+        btn.innerText = "Processing...";
+        const capture = document.getElementById('capture-area');
+        
+        html2canvas(capture).then(canvas => {
+            canvas.toBlob(blob => {
+                const file = new File([blob], "result.png", {type: "image/png"});
+                const data = {
+                    title: 'My Quiz Score',
+                    text: `I scored ${document.getElementById('lbl-percent').innerText} in Social Science! Can you beat me?`,
+                    url: window.location.href,
+                    files: [file]
+                };
+                if(navigator.canShare && navigator.canShare(data)) {
+                    navigator.share(data).catch(console.error);
+                } else {
+                    alert("Sharing not supported. Screenshot saved.");
+                }
+                btn.innerText = "📤 Share";
+            });
+        });
+    }
+
+    // Start App
+    initApp();
+
+</script>
+</body>
+</html>
